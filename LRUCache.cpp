@@ -1,5 +1,5 @@
 #include <list>
-#include <map> 
+#include <unordered_map> 
 
 /**
  * Least Recently Used (LRU) cache
@@ -9,7 +9,7 @@ class LRUCache {
 public:
     typedef std::list<std::pair<int, int>> list_t;
     typedef list_t::iterator list_iterator_t;
-    typedef std::map<int, list_iterator_t> hash_t;
+    typedef std::unordered_map<int, list_iterator_t> hash_t;
     typedef hash_t::iterator hash_iterator_t;
 
     int size_, capacity_;
@@ -37,6 +37,10 @@ public:
     }
 
     void put(int key, int value) {
+        if (!capacity_) {
+            return;
+        }
+
         auto it = hash_.find(key);
 
         if (it != hash_.end()) {
@@ -60,24 +64,30 @@ public:
 /**
  * Your LRUCache object will be instantiated and called as such:
  * LRUCache* obj = new LRUCache(capacity);
- * int param_1 = obj->get(key);
+ * int param = obj->get(key);
  * obj->put(key,value);
  */
 
 #include <iostream>
 
 int main() {
-    LRUCache* cache = new LRUCache(2 /* capacity */ );
+    LRUCache* cache = new LRUCache(3 /* capacity */ );
 
-    cache->put(1, 10);
-    cache->put(2, 20);
-    std::cout << cache->get(1) << '\n';      // returns 1
-    cache->put(3, 30);                       // evicts key 2
-    std::cout << cache->get(2) << '\n';      // returns -1 (not found)
-    cache->put(4, 40);                       // evicts key 1
-    std::cout << cache->get(1) << '\n';      // returns -1 (not found)
-    std::cout << cache->get(3) << '\n';      // returns 3
-    std::cout << cache->get(4) << '\n';      // returns 4
+    cache->put(1, 1);
+    cache->put(2, 2);
+    cache->put(3, 3);
+    std::cout << cache->get(1) << '\n';     // returns 1
+    cache->put(4, 4);                       // evicts key 2
+    std::cout << cache->get(1) << '\n';     // returns 1
+    std::cout << cache->get(2) << '\n';     // returns -1 (not found)
+    std::cout << cache->get(3) << '\n';     // returns 3
+    std::cout << cache->get(4) << '\n';     // returns 4
+    cache->put(3, 3);
+    cache->put(5, 5);                       // evicts key 4
+    std::cout << cache->get(1) << '\n';     // returns -1 (not found)
+    std::cout << cache->get(3) << '\n';     // returns 3
+    std::cout << cache->get(4) << '\n';     // returns 4
+    std::cout << cache->get(5) << '\n';     // returns 5
 
     return 0;
 }
